@@ -1,10 +1,6 @@
 #include "commTimeManager.h"
-//#include "globalObjects.h"      // Include the global espClient declaration
 #include <WiFiClient.h>
-//#include <PubSubClient.h>
 #include "commConfig.h"
-//#include <WiFi.h>
-//#include "time.h"
 
 // NTP Server and timezone settings
 const char* ntpServer = "pool.ntp.org";
@@ -35,4 +31,19 @@ unsigned long getEpochTime() {
     time_t now;
     time(&now); // Get current time
     return now; // Return epoch time
+}
+
+String getDateTime() {
+    time_t now;
+    struct tm timeinfo;
+
+    time(&now); // Get current time in epoch format
+    localtime_r(&now, &timeinfo); // Convert epoch time to tm struct
+
+    char buffer[80]; // To store the formatted datetime string
+
+    // Format the time (e.g., "2024-12-21 13:45:30")
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+
+    return String(buffer); // Return the formatted string
 }

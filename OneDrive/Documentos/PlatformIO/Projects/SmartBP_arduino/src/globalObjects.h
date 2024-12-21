@@ -10,6 +10,5 @@ extern PubSubClient client;
 extern MAX30105 particleSensor;
 extern unsigned long lastRequestedPublishTime;
 extern const char* mqtt_data_topic;
-extern volatile bool startMeasurement;
 
 #endif
