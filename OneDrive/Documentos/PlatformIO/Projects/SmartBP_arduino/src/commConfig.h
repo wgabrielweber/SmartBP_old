@@ -11,5 +11,6 @@
 
 // MQTT Topics
 #define MQTT_DATA_TOPIC "prototype_esp/data";
+#define MQTT_SUB_TOPIC "prototype_esp/command";
 
 #endif // CONFIG_H

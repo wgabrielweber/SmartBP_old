@@ -6,6 +6,13 @@
 
 // Perform complete measurement and send data via mqtt
 void performMeasurement() {   
+    display.clearDisplay();
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(SSD1306_WHITE);        // Draw white text
+    display.setCursor(0,0);             // Start at top-left corner
+    display.println(F("Measure started!"));
+    display.display();
+    
     // Wake the sensor
     ppgSensor.wakeUp();
 
@@ -49,26 +56,6 @@ void performMeasurement() {
             ppgSensor.nextSample(); // Move to the next sample
         }
     }
-    /*
-    // Start the measure routine
-    while (arraySamples < MAX_SAMPLES) {
-    ppgSensor.check(); //Check the sensor, read up to 3 samples
-
-        while (ppgSensor.available()) //do we have new data?
-        {
-            // Read sensor FIFO
-            redReading = ppgSensor.getFIFORed();
-            irReading = ppgSensor.getFIFOIR();
-            // Store the readings in the arrays
-            redValues[arraySamples] = redReading;
-            irValues[arraySamples] = irReading;
-
-            arraySamples++;
-
-            ppgSensor.nextSample(); //We're finished with this sample so move to next sample
-        }
-    }
-    */
 
     // Calculate the measure time
     measureTime = millis() - startMeasure;
@@ -94,10 +81,21 @@ void performMeasurement() {
         irValues[i] -= irMin;
     }
 
-    //String payload = createJsonPayload(arraySamples, redValues, irValues);
-    String payload = createStringPayload("ESP32", getEpochTime(), measureTime, redValues, irValues, MAX_SAMPLES);
+    //String payload = createJsonPayload(arraySamples, redValues, irValues);    // Send payload in json format
+    String payload = createStringPayload("ESP32", getEpochTime(), measureTime, redValues, irValues, MAX_SAMPLES);   // Send payload in string format
     client.publish("prototype_esp/data", payload.c_str());
         
     Serial.println("Data published successfully.");
-    //Serial.println(payload);
+
+    display.clearDisplay();
+
+    display.setTextSize(1);             // Normal 1:1 pixel scale
+    display.setTextColor(SSD1306_WHITE);        // Draw white text
+    display.setCursor(0,0);             // Start at top-left corner
+    display.println(F("Data Sent!"));
+
+    display.display();
+    delay(2000);
+    display.clearDisplay();
+    display.display();
 }
