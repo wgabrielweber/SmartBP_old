@@ -6,8 +6,12 @@
 
 // Perform complete measurement and send data via mqtt
 void performMeasurement() {   
+    // Wake the sensor
+    ppgSensor.wakeUp();
+
     // Define constants
-    const int MAX_SAMPLES = 500;  // Maximum number of samples
+    const int MAX_SAMPLES = 500;           // Maximum number of samples
+    const int EXTRA_SAMPLES = 20;          // Extra samples to exclude invalid readings in the sensor initialization 
     unsigned int redValues[MAX_SAMPLES];   // Array to store red values
     unsigned int irValues[MAX_SAMPLES];    // Array to store IR values
     unsigned int redReading;
@@ -16,29 +20,61 @@ void performMeasurement() {
     unsigned int startMeasure = 0;
     unsigned int measureTime = 0;
 
+    // Phase 1: Discard initial invalid samples
+    int warmUpSamples = 0;
+    while (warmUpSamples < EXTRA_SAMPLES) {
+        ppgSensor.check(); // Check the sensor, read up to 3 samples
+
+        while (ppgSensor.available()) {
+            // Discard initial readings
+            redReading = ppgSensor.getFIFORed();
+            irReading = ppgSensor.getFIFOIR();
+            warmUpSamples++;
+            ppgSensor.nextSample(); // Move to the next sample
+        }
+    }
+
     // Auxiliary variable to calculate the measure time
     startMeasure = millis();
 
+    // Phase 2: Collect valid samples
+    while (arraySamples < MAX_SAMPLES) {
+        ppgSensor.check(); // Check the sensor, read up to 3 samples
+
+        while (ppgSensor.available()) {
+            // Read and store valid samples
+            redValues[arraySamples] = ppgSensor.getFIFORed();
+            irValues[arraySamples] = ppgSensor.getFIFOIR();
+            arraySamples++;
+            ppgSensor.nextSample(); // Move to the next sample
+        }
+    }
+    /*
     // Start the measure routine
     while (arraySamples < MAX_SAMPLES) {
-    particleSensor.check(); //Check the sensor, read up to 3 samples
+    ppgSensor.check(); //Check the sensor, read up to 3 samples
 
-        while (particleSensor.available()) //do we have new data?
+        while (ppgSensor.available()) //do we have new data?
         {
             // Read sensor FIFO
-            redReading = particleSensor.getFIFORed();
-            irReading = particleSensor.getFIFOIR();
+            redReading = ppgSensor.getFIFORed();
+            irReading = ppgSensor.getFIFOIR();
             // Store the readings in the arrays
             redValues[arraySamples] = redReading;
             irValues[arraySamples] = irReading;
 
             arraySamples++;
 
-            particleSensor.nextSample(); //We're finished with this sample so move to next sample
+            ppgSensor.nextSample(); //We're finished with this sample so move to next sample
         }
     }
+    */
+
     // Calculate the measure time
     measureTime = millis() - startMeasure;
+
+    // Shut the sensor down
+    ppgSensor.shutDown();
 
     // Once the loop ends, array is full
     Serial.println("Data collection complete. Performing optimization...");

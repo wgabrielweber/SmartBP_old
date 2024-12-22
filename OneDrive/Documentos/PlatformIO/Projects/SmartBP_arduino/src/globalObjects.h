@@ -7,7 +7,7 @@
 
 extern WiFiClient espClient; // Declare the global instance
 extern PubSubClient client;
-extern MAX30105 particleSensor;
+extern MAX30105 ppgSensor;
 extern unsigned long lastRequestedPublishTime;
 extern const char* mqtt_data_topic;
 

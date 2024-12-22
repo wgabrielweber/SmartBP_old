@@ -14,7 +14,7 @@ const unsigned long publishInterval = 15000; // 15 seconds for publishing
 unsigned long lastRequestedPublishTime = 0;
 
 // Define Global instances
-MAX30105 particleSensor;
+MAX30105 ppgSensor;
 
 long startTime;
 byte interruptPin = 2; //Connect INT pin on breakout board to pin 3
@@ -32,7 +32,7 @@ void setup() {
     client.subscribe("prototype_esp/command");
 
     // Initialize sensor
-    if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) //Use default I2C port, 400kHz speed
+    if (!ppgSensor.begin(Wire, I2C_SPEED_FAST)) //Use default I2C port, 400kHz speed
     {
         Serial.println("MAX30105 was not found. Please check wiring/power. ");
         while (1);
@@ -44,15 +44,15 @@ void setup() {
     byte ledMode = 2;           //Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
     int sampleRate = 800;       //Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
     int pulseWidth = 118;       //Options: 69, 118, 215, 411
-    int adcRange = 16384;        //Options: 2048, 4096, 8192, 16384
+    int adcRange = 16384;       //Options: 2048, 4096, 8192, 16384
 
-    particleSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange); //Configure sensor with these settings
+    ppgSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange); //Configure sensor with these settings
 
-    particleSensor.enableAFULL(); //Enable the almost full interrupt (default is 32 samples)
+    ppgSensor.enableAFULL(); //Enable the almost full interrupt (default is 32 samples)
 
-    particleSensor.setFIFOAlmostFull(3); //Set almost full int to fire at 29 samples
+    ppgSensor.setFIFOAlmostFull(3); //Set almost full int to fire at 29 samples
 
-    startTime = millis();
+    ppgSensor.shutDown(); // Shut down the sensor, wake up only when a measure will be made
 }
 
 void loop() {
@@ -63,9 +63,5 @@ void loop() {
 
     // Handle MQTT and ensure it is active
     client.loop();
-
-    //performMeasurement();
-
-    //delay(5000);
 
 }
