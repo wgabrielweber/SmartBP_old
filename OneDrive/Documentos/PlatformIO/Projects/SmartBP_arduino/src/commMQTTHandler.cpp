@@ -1,8 +1,10 @@
 #include "commMQTTHandler.h"
 #include <WiFiClient.h>
 #include <PubSubClient.h>
-#include "commConfig.h"
+#include "defines.h"
 #include "globalObjects.h"
+#include "commTimeManager.h"
+#include "measureRoutine.h"
 
 // MQTT Broker credentials and topics
 const char* mqtt_server = MQTT_SERVER;
@@ -32,12 +34,15 @@ void connectToMQTT() {
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
     // Convert payload to a string
     String message;
+    String datetime;
     for (unsigned int i = 0; i < length; i++) {
         message += (char)payload[i];
     }
 
     if (String(topic) == "prototype_esp/command" && message == "new_measure") {
-        Serial.println("Received new_measure command.");
-        startMeasurement = true;
+        datetime = getDateTime();
+        Serial.print("Received new_measure command: ");
+        Serial.println(datetime);
+        performMeasurement();
     }
 }

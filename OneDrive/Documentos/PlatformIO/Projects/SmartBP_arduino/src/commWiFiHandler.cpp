@@ -1,7 +1,7 @@
 #include "commWiFiHandler.h"
 #include <WiFi.h>
 #include "commTimeManager.h"
-#include "commConfig.h"
+#include "defines.h"
 
 // Wi-Fi credentials
 const char* ssid = WIFI_SSID;

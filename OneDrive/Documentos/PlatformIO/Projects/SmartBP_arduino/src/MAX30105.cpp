@@ -97,10 +97,10 @@ static const uint8_t MAX30105_MODE_MULTILED = 	0x07;
 
 // Particle sensing configuration commands (pgs 19-20)
 static const uint8_t MAX30105_ADCRANGE_MASK = 	0x9F;
-static const uint8_t MAX30105_ADCRANGE_2048 = 	0x00;
-static const uint8_t MAX30105_ADCRANGE_4096 = 	0x20;
-static const uint8_t MAX30105_ADCRANGE_8192 = 	0x40;
-static const uint8_t MAX30105_ADCRANGE_16384 = 	0x60;
+static const uint8_t MAX30105_ADCRANGE_15 = 	0x00;
+static const uint8_t MAX30105_ADCRANGE_16 = 	0x20;
+static const uint8_t MAX30105_ADCRANGE_17 = 	0x40;
+static const uint8_t MAX30105_ADCRANGE_18 = 	0x60;
 
 static const uint8_t MAX30105_SAMPLERATE_MASK = 0xE3;
 static const uint8_t MAX30105_SAMPLERATE_50 = 	0x00;
@@ -258,7 +258,7 @@ void MAX30105::setLEDMode(uint8_t mode) {
 }
 
 void MAX30105::setADCRange(uint8_t adcRange) {
-  // adcRange: one of MAX30105_ADCRANGE_2048, _4096, _8192, _16384
+  // adcRange: one of MAX30105_ADCRANGE: 15, 16, 17, 18
   bitMask(MAX30105_PARTICLECONFIG, MAX30105_ADCRANGE_MASK, adcRange);
 }
 
@@ -467,13 +467,13 @@ void MAX30105::setup(byte powerLevel, byte sampleAverage, byte ledMode, int samp
 
   //Particle Sensing Configuration
   //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  if(adcRange < 4096) setADCRange(MAX30105_ADCRANGE_2048); //7.81pA per LSB
-  else if(adcRange < 8192) setADCRange(MAX30105_ADCRANGE_4096); //15.63pA per LSB
-  else if(adcRange < 16384) setADCRange(MAX30105_ADCRANGE_8192); //31.25pA per LSB
-  else if(adcRange == 16384) setADCRange(MAX30105_ADCRANGE_16384); //62.5pA per LSB
-  else setADCRange(MAX30105_ADCRANGE_2048);
+  if(adcRange == 15) setADCRange(MAX30105_ADCRANGE_15); //7.81pA per LSB
+  else if(adcRange == 16) setADCRange(MAX30105_ADCRANGE_16); //15.63pA per LSB
+  else if(adcRange == 17) setADCRange(MAX30105_ADCRANGE_17); //31.25pA per LSB
+  else if(adcRange == 18) setADCRange(MAX30105_ADCRANGE_18); //62.5pA per LSB
+  else setADCRange(MAX30105_ADCRANGE_15);
 
-  if (sampleRate < 100) setSampleRate(MAX30105_SAMPLERATE_50); //Take 50 samples per second
+  if (sampleRate <= 100) setSampleRate(MAX30105_SAMPLERATE_50); //Take 50 samples per second
   else if (sampleRate < 200) setSampleRate(MAX30105_SAMPLERATE_100);
   else if (sampleRate < 400) setSampleRate(MAX30105_SAMPLERATE_200);
   else if (sampleRate < 800) setSampleRate(MAX30105_SAMPLERATE_400);
