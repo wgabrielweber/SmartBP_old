@@ -1,7 +1,7 @@
 #include "commMQTTHandler.h"
 #include <WiFiClient.h>
 #include <PubSubClient.h>
-#include "commConfig.h"
+#include "defines.h"
 #include "globalObjects.h"
 #include "commTimeManager.h"
 #include "measureRoutine.h"

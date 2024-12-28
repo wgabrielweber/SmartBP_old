@@ -3,15 +3,12 @@
 #include "globalObjects.h"
 #include "payload.h"
 #include "commTimeManager.h"
+#include "displayFunctions.h"
 
 // Perform complete measurement and send data via mqtt
 void performMeasurement() {   
-    display.clearDisplay();
-    display.setTextSize(1);             // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);        // Draw white text
-    display.setCursor(0,0);             // Start at top-left corner
-    display.println(F("Measure started!"));
-    display.display();
+    // Oled New Measure
+    displayNewMeasure();
     
     // Wake the sensor
     ppgSensor.wakeUp();
@@ -67,16 +64,16 @@ void performMeasurement() {
     Serial.println("Data collection complete. Performing optimization...");
 
     // Find the minimum values in the arrays
-    uint16_t redMin = UINT16_MAX;
-    uint16_t irMin = UINT16_MAX;
+    unsigned int redMin = 262144;
+    unsigned int irMin  = 262144;
 
-    for (uint16_t i = 0; i < arraySamples; i++) {
+    for (unsigned int i = 0; i < arraySamples; i++) {
         redMin = (redValues[i] < redMin) ? redValues[i] : redMin;
         irMin = (irValues[i] < irMin) ? irValues[i] : irMin;
     }
 
     // Subtract the minimum value from all elements
-    for (uint16_t i = 0; i < arraySamples; i++) {
+    for (unsigned int i = 0; i < arraySamples; i++) {
         redValues[i] -= redMin;
         irValues[i] -= irMin;
     }
@@ -87,15 +84,6 @@ void performMeasurement() {
         
     Serial.println("Data published successfully.");
 
-    display.clearDisplay();
-
-    display.setTextSize(1);             // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);        // Draw white text
-    display.setCursor(0,0);             // Start at top-left corner
-    display.println(F("Data Sent!"));
-
-    display.display();
-    delay(2000);
-    display.clearDisplay();
-    display.display();
+    // Oled Data Sent
+    displayDataSent();
 }

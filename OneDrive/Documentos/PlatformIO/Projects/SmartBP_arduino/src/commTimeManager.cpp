@@ -1,6 +1,6 @@
 #include "commTimeManager.h"
 #include <WiFiClient.h>
-#include "commConfig.h"
+#include "defines.h"
 
 // NTP Server and timezone settings
 const char* ntpServer = "pool.ntp.org";

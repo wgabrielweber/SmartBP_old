@@ -1,21 +1,16 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "globalObjects.h"
-//#include "commConfig.h"
+#include "defines.h"
 #include "commWiFiHandler.h"
 #include "commMQTTHandler.h"
 #include "commTimeManager.h"
 #include "payload.h"
 #include "measureRoutine.h"
+#include "displayFunctions.h"
 #include "MAX30105.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-
-#define OLED_RESET -1
-#define SCREEN_ADDRESS 0x3C
 
 unsigned long lastPublishTime = 0;
 const unsigned long publishInterval = 15000; // 15 seconds for publishing
@@ -49,12 +44,16 @@ void setup() {
     }
 
     // Sensor Setup
-    byte ledBrightness = 0x1F;  //Options: 0=Off to 255=50mA
-    byte sampleAverage = 8;     //Options: 1, 2, 4, 8, 16, 32
-    byte ledMode = 2;           //Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
-    int sampleRate = 1000;       //Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
+//_____________________________  sample rate = 800Hz  ; pulse width = 215 ; adc range = 17 bits ; 200Hz with 4 samples
+//_____________________________  sample rate = 1000Hz : pulse width = 118 ; adc range = 16 bits ; 125Hz with 8 samples
+//_____________________________  sample rate = 1600Hz ; pulse width = 69  ; adc range = 15 bits ; 200Hz with 8 samples
+//_____________________________  sample rate = 1600Hz ; pulse width = 69  ; adc range = 15 bits ; 100Hz with 16 samples
+    byte ledBrightness = 0x1F; //Options: 0=Off to 255=50mA
+    byte sampleAverage = 8;   //Options: 1, 2, 4, 8, 16, 32
+    byte ledMode = 2;          //Options: 1 = Red only, 2 = Red + IR, 3 = Red + IR + Green
+    int sampleRate = 1000;     //Options: 50, 100, 200, 400, 800, 1000, 1600, 3200
     int pulseWidth = 118;       //Options: 69, 118, 215, 411
-    int adcRange = 16384;       //Options: 2048, 4096, 8192, 16384
+    int adcRange = 16;         //Options: 15, 16, 17, 18 [bits]
 
     ppgSensor.setup(ledBrightness, sampleAverage, ledMode, sampleRate, pulseWidth, adcRange); //Configure sensor with these settings
 
@@ -84,30 +83,5 @@ void loop() {
     // Handle MQTT and ensure it is active
     client.loop();
 
-    display.clearDisplay();
-    display.display();
-    display.setTextSize(1);             // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);        // Draw white text
-    display.setCursor(0,56);             // Start at top-left corner
-    display.println(F("Waiting measure"));
-    display.display();
-    delay(500);
-    display.setTextSize(1);             // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);        // Draw white text
-    display.setCursor(0,56);             // Start at top-left corner
-    display.println(F("Waiting measure."));
-    display.display();
-    delay(500);
-    display.setTextSize(1);             // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);        // Draw white text
-    display.setCursor(0,56);             // Start at top-left corner
-    display.println(F("Waiting measure.."));
-    display.display();
-    delay(500);
-    display.setTextSize(1);             // Normal 1:1 pixel scale
-    display.setTextColor(SSD1306_WHITE);        // Draw white text
-    display.setCursor(0,56);             // Start at top-left corner
-    display.println(F("Waiting measure..."));
-    display.display();
-    delay(500);
+    displayLoop();
 }
